@@ -1,37 +1,52 @@
-package pq_AWT_Swing2;
+package vista;
+
+import modelo.Cliente;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.util.ArrayList;
 
 import javax.swing.*;
 
-public class Doble extends JFrame
-{
+public class VentanaCliente extends JFrame {
+    
+    //Estuctura de datos y control de índice
+    private ArrayList<Cliente> listaClientes;
+    private int indiceActual = 0;
 
     //Etiquetas para identificar los campos de texto
     private JLabel numeroLabel;
     private JLabel nombreLabel;
     private JLabel edadLabel;
+    private JLabel puntosLabel;
 
     //Text fields para introducir números (ahora son de Swing: JTextField)
     private JTextField numeroField;
     private JTextField nombreField;
     private JTextField edadField;
+    private JTextField puntosField;
 
     private JButton atrasButton;
     private JButton delanteButton;
 
-    public Doble() {
-        super("Doble");
+    public VentanaCliente() {
+        super("Gestión de Clientes");
 
         //Lo que pasa si cerramos la ventana (sustituye al WindowListener
         //con windowClosing y System.exit(0) de la versión anterior).
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        
+        // Iniciar la estructura de datos y añadir 3 clientes precargados
+        listaClientes = new ArrayList<>();
+        listaClientes.add(new Cliente(1, "Amador Moreno", 19, 727.0));
+        listaClientes.add(new Cliente(2, "Adán Morales", 20, 50.50));
+        listaClientes.add(new Cliente(3, "Luis Delgado", 19, 10.01));
 
         //Crea las etiquetas.
         numeroLabel = new JLabel("Número: ");
         nombreLabel = new JLabel("Nombre: ");
         edadLabel = new JLabel("Edad: ");
+        puntosLabel = new JLabel("Puntos: ");
 
         //Campo donde vamos a introducir el número
         numeroField = new JTextField(10);
@@ -46,18 +61,32 @@ public class Doble extends JFrame
         edadField.setEditable(false);
         edadField.setForeground(Color.blue);
         
+        puntosField = new JTextField(10);
+        puntosField.setEditable(false);
+        puntosField.setForeground(Color.orange);
+        
+        //Lógica del botón "Atrás"
         atrasButton = new JButton("Atrás");
         atrasButton.setMnemonic(KeyEvent.VK_I);
         atrasButton.addActionListener(new ActionListener() {  // Evento de boton.
             public void actionPerformed(ActionEvent e) {
+                if (indiceActual > 0) {
+                    indiceActual--;
+                    mostrarClienteActual();
+                }
                 System.out.println("Atrás");
             }
         });
         
+        //Lógica del botón "Siguiente"
         delanteButton = new JButton("Siguiente");
         delanteButton.setMnemonic(KeyEvent.VK_I);
         delanteButton.addActionListener(new ActionListener() {  // Evento de boton.
             public void actionPerformed(ActionEvent e) {
+                if (indiceActual < listaClientes.size() - 1) {
+                    indiceActual++;
+                    mostrarClienteActual();
+                }
                 System.out.println("Siguiente");
             }
         });
@@ -68,6 +97,7 @@ public class Doble extends JFrame
         labelPane.add(numeroLabel);
         labelPane.add(nombreLabel);
         labelPane.add(edadLabel);
+        labelPane.add(puntosLabel);
 
         //Dispone los campos de texto en otro panel
         JPanel fieldPane = new JPanel();
@@ -75,6 +105,7 @@ public class Doble extends JFrame
         fieldPane.add(numeroField);
         fieldPane.add(nombreField);
         fieldPane.add(edadField);
+        fieldPane.add(puntosField);
         
         //Dispone los botones de atrás y siguiente
         JPanel botonesPane = new JPanel();
@@ -95,7 +126,24 @@ public class Doble extends JFrame
 
         setContentPane(contentPane);  //this.setContentPane(contentPane);
           // es set, o sea, machado el contenedor del objeto "Doble", hijo de JFrame
+          
+        mostrarClienteActual();
 
+    }
+    
+    public void mostrarClienteActual() {
+        Cliente c = listaClientes.get(indiceActual);
+        
+        //Usamos los métodos "get" del modelo
+        numeroField.setText(String.valueOf(c.getNumero()));
+        nombreField.setText(c.getNombre());
+        edadField.setText(String.valueOf(c.getEdad()));
+        puntosField.setText(String.valueOf(c.getPuntos()));
+        
+        //Activar o desactivar botones según los clientes que existan
+        atrasButton.setEnabled(indiceActual > 0);
+        delanteButton.setEnabled(indiceActual < listaClientes.size() - 1);
+        
     }
 
     public static void main(String[] args) {
@@ -103,14 +151,11 @@ public class Doble extends JFrame
         // Toda la interfaz Swing se crea en el hilo de eventos (receta: se hace siempre así).
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                final Doble app = new Doble();
+                final VentanaCliente app = new VentanaCliente();
                 
                 app.pack();
                 app.setVisible(true);
             }
         });
     }
-
-
-
 }
